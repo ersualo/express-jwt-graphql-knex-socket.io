@@ -8,9 +8,13 @@ import graph from './controllers/graph'
 var router = express.Router();
 
 let app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended : false}));
+//app.use('/api', require('./middlewares/auth.js'));
 app.use('/api', graph);
 app.use('/', require('./controllers/user.js')(router));
 app.use(express.static('public'));
+
 
 //server running
 var server = app.listen(PORT, function(){
