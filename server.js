@@ -1,23 +1,20 @@
 import express from 'express';
+import expressGraphQL  from "express-graphql";
 import bodyParser from 'body-parser';
-import {promisify} from 'bluebird';
 import {HOST, PORT} from './config/config';
-import Knex from './config/knex';
+import cors from 'cors';
+import graph from './controllers/graph'
 
 var router = express.Router();
 
 let app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended : false}));
-app.use('/api', require('./middlewares/auth.js'));
-app.use('/api', require('./controllers/graph')(router));
+app.use('/api', graph);
 app.use('/', require('./controllers/user.js')(router));
 app.use(express.static('public'));
 
 //server running
-var server = app.listen(8000, function(){
-  console.log('Running on port 8000!');
+var server = app.listen(PORT, function(){
+  console.log('Running on port ' + PORT);
 });
 
 //server sockets
