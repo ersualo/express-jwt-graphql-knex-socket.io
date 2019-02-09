@@ -8,6 +8,45 @@ import {
 } from 'graphql';
 import Knex from '../config/knex';
 
+const User = new GraphQLObjectType({
+  name: 'User',
+  fields : () => ({
+    id_user: {
+      type: GraphQLID
+    },
+    name : {
+      type : GraphQLString
+    },
+    rol : {
+      type : GraphQLString
+    },
+    email : {
+      type : GraphQLString
+    },
+    phone : {
+      type : GraphQLString
+    },
+    password : {
+      type: GraphQLString
+    }
+  })
+});
+
+const Reserve = new GraphQLObjectType({
+  name : 'Reserve',
+  fields : () => ({
+    id_reserve: {
+      type :GraphQLID
+    },
+    init : {
+      type: GraphQLString
+    },
+    cost : {
+      type: GraphQLString
+    }
+  })
+})
+
 const Story = new GraphQLObjectType({
   name: 'Story',
   fields: () => ({

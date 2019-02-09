@@ -6,6 +6,7 @@ module.exports = function(router) {
         /*
          * Check if the username and password is correct
          */
+        console.log('the request', req.body);
         if( req.body.username === 'admin' && req.body.password === 'admin' ) {
             res.json({
                 id: 1,
