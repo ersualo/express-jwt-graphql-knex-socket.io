@@ -8,6 +8,45 @@ import {
 } from 'graphql';
 import Knex from '../config/knex';
 
+const User = new GraphQLObjectType({
+  name: 'User',
+  fields : () => ({
+    id_user: {
+      type: GraphQLID
+    },
+    name : {
+      type : GraphQLString
+    },
+    rol : {
+      type : GraphQLString
+    },
+    email : {
+      type : GraphQLString
+    },
+    phone : {
+      type : GraphQLString
+    },
+    password : {
+      type: GraphQLString
+    }
+  })
+});
+
+const Reserve = new GraphQLObjectType({
+  name : 'Reserve',
+  fields : () => ({
+    id_reserve: {
+      type :GraphQLID
+    },
+    init : {
+      type: GraphQLString
+    },
+    cost : {
+      type: GraphQLString
+    }
+  })
+})
+
 const Story = new GraphQLObjectType({
   name: 'Story',
   fields: () => ({
@@ -18,11 +57,10 @@ const Story = new GraphQLObjectType({
       type: GraphQLString
     },
     author: {
-      type: User,
-      async resolve(parent, args, {rootValue: {db}}) {
-        console.log("author's resolve");
+      type: Author,
+      async resolve(parent, args) {
         let author;
-        await Knex.select('*').from('user').where('id', '=', parent.author).then((results) => {
+        await Knex.select('*').from('author').where('id', '=', parent.author).then((results) => {
           author = results[0];
         });
         return author;
@@ -31,8 +69,8 @@ const Story = new GraphQLObjectType({
   })
 });
 
-const User = new GraphQLObjectType({
-  name: 'User',
+const Author = new GraphQLObjectType({
+  name: 'Author',
   fields: () => ({
     id: {
       type: GraphQLID
@@ -42,10 +80,9 @@ const User = new GraphQLObjectType({
     },
     stories: {
       type: new GraphQLList(Story),
-      async resolve(parent, args, {rootValue: {db}}) {
-        console.log("User's resolver");
+      async resolve(parent, args) {
         let stories;
-        await knex.select('*').from('story').where('author', '=', parent.Id).then((results) => {
+        await Knex.select('*').from('story').where('author', '=', parent.id).then((results) => {
           stories = results;
         });
         return stories;
@@ -57,39 +94,32 @@ const User = new GraphQLObjectType({
 const Query = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
-    viewer: {
-      type: User,
-      async resolve(parent, args, {rootValue: {db, userId}}) {
-        console.log("Query viewer resolve");
-          let user;
-          await Knex.select('*').from('user').where('id', '=', userId).limit(1).then((results) => {
-            user =  results;
-          }).catch((error) => {
-            return error;
-          });
-          return user[0];
-      }
-    },
-    user: {
-      type: User,
+    author: {
+      type: Author,
       args : {
         id : {
           type : new GraphQLNonNull(GraphQLID)
         }
       },
-      async resolve(parent, {id}, {rootValue: {db}}) {
-        console.log("Query user resolve");
-          let user;
-          await Knex.select('*').from('user').where('id', '=', id).limit(1).then((results) => {
-            user =  results;
+      async resolve(parent, {id}) {
+          let author;
+          await Knex.select('*').from('author').where('id', '=', id).limit(1).then((results) => {
+            author =  results;
           }).catch((error) => {
             return error;
           });
-          return user[0];
+          return author[0];
       }
     },
-    users : {
-      type : new GraphQLList(User)
+    authors : {
+      type : new GraphQLList(Author),
+      async resolve(parent, id){
+        let authors;
+        await Knex.select('*').from('author').then((results) => {
+            authors = results;
+        });
+        return authors;
+      }
     },
     story: {
       type: Story,
@@ -98,16 +128,25 @@ const Query = new GraphQLObjectType({
           type: new GraphQLNonNull(GraphQLID)
         }
       },
-      async resolve(parent, {id}, {rootValue: {db}}) {
-        console.log("Query story resolve");
-          let user;
+      async resolve(parent, {id}) {
+          let story;
           await Knex.select('*').from('story').where('id', '=', id).limit(1).then((results) => {
-            user =  results;
+            story =  results[0];
           }).catch((error) => {
             return error;
           });
-          return user[0];
+          return story;
       }
+    },
+    stories :{
+        type : new GraphQLList(Story),
+        async resolve(parent, id){
+            let stories;
+            await Knex.select('*').from('story').then((results) => {
+                stories = results;
+            });
+            return stories;
+        }
     }
   })
 });

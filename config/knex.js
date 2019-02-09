@@ -3,8 +3,8 @@ export default require ('knex') ({
 	connection : {
 		host : 'localhost',
 		user : 'root',
-		password: '',
-		database : 'graph',
+		password: 'root*123',
+		database : 'cracks',
 		charset : 'utf8'
 	}
 });
